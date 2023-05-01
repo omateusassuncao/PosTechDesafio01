@@ -56,16 +56,6 @@ namespace PosTechDesafio01.Controllers
             //Response.Redirect(messageImage.imageUrl);
 
             //stepFive
-            //var requestPost = new HttpRequestMessage(
-            //HttpMethod.Post,
-            //    "https://fiap-dotnet.azurewebsites.net/Power/"
-            //    + "polarbear"
-            //    );
-            //requestPost.Headers.Add("Accept", "*/*");
-            //requestPost.Headers.Add("Content-type", "image/jpg");
-            //requestPost.Headers.Add("User-Agent", "PosTechDesafio01");
-
-            //stepFive
             string endpoint = "https://fiap-dotnet.azurewebsites.net/Power/polarbear/";
             string filePath = @"C:\Users\mateu\source\repos\PosTech\PosTechDesafio01\time.jpg";
             var form = new MultipartFormDataContent();
