@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Http;
 using PosTechDesafio01.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("Connection");
 
 builder.Services.AddDbContext<ApplicationContext>(opts => opts.UseNpgsql(connectionString));
+builder.Services.AddHttpClient();
 
 builder.Services.AddControllers();
 

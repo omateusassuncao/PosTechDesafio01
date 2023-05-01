@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PosTechDesafio01.Data;
-using PosTechDesafio01.Model;
+using System.Net.Http.Headers;
 
 namespace PosTechDesafio01.Controllers
 {
@@ -11,18 +11,79 @@ namespace PosTechDesafio01.Controllers
     {
 
         private ApplicationContext _context;
+        private IHttpClientFactory _httpClientFactory;
 
-        public DesafioController(ApplicationContext context)
+        public DesafioController(ApplicationContext context, IHttpClientFactory httpClientFactory)
         {
             _context = context;
+            _httpClientFactory = httpClientFactory;
         }
 
+
         [HttpGet]
-        public string Desafio()
+        public async Task<HttpResponseMessage> DesafioAsync()
         {
+
+            var client = _httpClientFactory.CreateClient();
+
+            //stepTwo
             var query = "select power_name from powers";
-            var result = _context.Powers.FromSql($"SELECT power_name from powers").ToList().FirstOrDefault();
-            return result.Name;
+            var resultQuery = _context.Powers.FromSql($"SELECT power_name from powers").ToList().FirstOrDefault();
+
+            //stepThree
+            var requestKey = new HttpRequestMessage(
+                HttpMethod.Get,
+                "https://fiap-dotnet.azurewebsites.net/Fiap/"
+                + resultQuery.Name
+                );
+            requestKey.Headers.Add("Accept", "application/json");
+            requestKey.Headers.Add("User-Agent", "PosTechDesafio01");
+
+            HttpResponseMessage responseKey = await client.SendAsync(requestKey);
+            KeyMessage messageKey = await responseKey.Content.ReadFromJsonAsync<KeyMessage>();
+
+            //stepFour
+            var requestImage = new HttpRequestMessage(
+            HttpMethod.Get,
+                "https://fiap-dotnet.azurewebsites.net/Power/"
+                + messageKey.Message
+                );
+            requestImage.Headers.Add("Accept", "application/json");
+            requestImage.Headers.Add("User-Agent", "PosTechDesafio01");
+
+            HttpResponseMessage responseImage = await client.SendAsync(requestImage);
+            ImageMessage messageImage = await responseImage.Content.ReadFromJsonAsync<ImageMessage>();
+            //Response.Redirect(messageImage.imageUrl);
+
+            //stepFive
+            //var requestPost = new HttpRequestMessage(
+            //HttpMethod.Post,
+            //    "https://fiap-dotnet.azurewebsites.net/Power/"
+            //    + "polarbear"
+            //    );
+            //requestPost.Headers.Add("Accept", "*/*");
+            //requestPost.Headers.Add("Content-type", "image/jpg");
+            //requestPost.Headers.Add("User-Agent", "PosTechDesafio01");
+
+            //stepFive
+            string endpoint = "https://fiap-dotnet.azurewebsites.net/Power/polarbear/";
+            string filePath = @"C:\Users\mateu\source\repos\PosTech\PosTechDesafio01\time.jpg";
+            var form = new MultipartFormDataContent();
+            var fileContent = new ByteArrayContent(System.IO.File.ReadAllBytes(filePath));
+            fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/jpg");
+            form.Add(fileContent, "file", "image.jpg");
+
+            HttpResponseMessage responsePost = await client.PostAsync(endpoint, form);
+
+            if (responsePost.IsSuccessStatusCode)
+            {
+                return responsePost;
+            }
+
+            return null;
         }
     }
 }
+
+//REFs
+//https://learn.microsoft.com/en-us/aspnet/core/fundamentals/http-requests?view=aspnetcore-2.2
