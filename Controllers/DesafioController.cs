@@ -56,7 +56,7 @@ namespace PosTechDesafio01.Controllers
             //Response.Redirect(messageImage.imageUrl);
 
             //stepFive
-            string endpoint = "https://fiap-dotnet.azurewebsites.net/Power/polarbear/";
+            string endpoint = "https://fiap-dotnet.azurewebsites.net/Power/urso/";
             string filePath = @"C:\Users\mateu\source\repos\PosTech\PosTechDesafio01\time.jpg";
             var form = new MultipartFormDataContent();
             var fileContent = new ByteArrayContent(System.IO.File.ReadAllBytes(filePath));
